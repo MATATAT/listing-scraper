@@ -1,5 +1,5 @@
 use clap::Parser;
-use epic_games_career_scraper::{
+use listing_scraper::{
     config::Config, hits::Hits, job_client::JobClient, listing_state::ListingState, result::*,
 };
 use std::{fs, path::Path, process::exit};

@@ -30,13 +30,21 @@ fn execute(args: Args) -> Result<()> {
 
     let fetched_hits = JobClient::new(config).request()?;
 
+    process(fetched_hits)?;
+
+    Ok(())
+}
+
+fn process(fetched_hits: Hits) -> Result<()> {
     let state = ListingState {
-        new: Hits(Vec::new()),
-        existing: Hits(Vec::new()),
-        closed: Hits(Vec::new()),
+        new: Hits::default(),
+        existing: Hits::default(),
+        closed: Hits::default(),
     };
     let new_state = state.update(fetched_hits);
     println!("New State: {:?}", new_state);
+
+    fs::write("./output.json", serde_json::to_string_pretty::<ListingState>(&new_state)?)?;
 
     Ok(())
 }

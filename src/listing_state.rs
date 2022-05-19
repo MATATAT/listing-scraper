@@ -18,9 +18,9 @@ impl ListingState {
     }
 
     fn get_new(&self, fetched_hits: &Hits) -> Hits {
-        let mut existing = self.new.0.iter().chain(self.existing.0.iter());
+        let mut existing = self.new.hits.iter().chain(self.existing.hits.iter());
         fetched_hits
-            .0
+            .hits
             .iter()
             .filter(|hit| {
                 !existing.any(|existing_hit| {
@@ -33,11 +33,11 @@ impl ListingState {
     fn get_existing(&self, fetched_hits: &Hits) -> Hits {
         let closed = self.get_closed(fetched_hits);
         self.new
-            .0
+            .hits
             .iter()
-            .chain(self.existing.0.iter())
+            .chain(self.existing.hits.iter())
             .filter(|hit| {
-                !closed.0.iter().any(|closed_hit| {
+                !closed.hits.iter().any(|closed_hit| {
                     closed_hit.id == hit.id && closed_hit.requisition_id == hit.requisition_id
                 })
             })
@@ -46,15 +46,15 @@ impl ListingState {
 
     fn get_closed(&self, fetched_hits: &Hits) -> Hits {
         self.new
-            .0
+            .hits
             .iter()
-            .chain(self.existing.0.iter())
+            .chain(self.existing.hits.iter())
             .filter(|hit| {
-                !fetched_hits.0.iter().any(|fetched_hit| {
+                !fetched_hits.hits.iter().any(|fetched_hit| {
                     fetched_hit.id == hit.id && fetched_hit.requisition_id == hit.requisition_id
                 })
             })
-            .chain(self.closed.0.iter())
+            .chain(self.closed.hits.iter())
             .collect()
     }
 }
@@ -64,29 +64,34 @@ mod tests {
     use super::*;
     use crate::hits::Hit;
 
-    fn hit(id: i64) -> Hit {
+    fn hit(id: &i64) -> Hit {
         Hit {
-            id,
+            id: *id,
             requisition_id: format!("R{}", id),
-            product: "".into(),
+            product: Some("".into()),
             title: "".into(),
         }
+    }
+
+    fn hits(hit_ids: Vec<i64>) -> Hits {
+        let hits = hit_ids.iter().map(hit).collect();
+        Hits { hits }
     }
 
     #[test]
     fn test_update() {
         let state = ListingState {
-            new: Hits(vec![hit(1), hit(2), hit(3)]),
-            existing: Hits(vec![hit(4), hit(5), hit(6)]),
-            closed: Hits(vec![hit(7), hit(8), hit(9)]),
+            new: hits(vec![1, 2, 3]),
+            existing: hits(vec![4, 5, 6]),
+            closed: hits(vec![7, 8, 9]),
         };
 
-        let fetched_hits = Hits(vec![hit(1), hit(2), hit(5), hit(6), hit(10)]);
+        let fetched_hits = hits(vec![1, 2, 5, 6, 10]);
 
         let expected = ListingState {
-            new: Hits(vec![hit(10)]),
-            existing: Hits(vec![hit(1), hit(2), hit(5), hit(6)]),
-            closed: Hits(vec![hit(3), hit(4), hit(7), hit(8), hit(9)]),
+            new: hits(vec![10]),
+            existing: hits(vec![1, 2, 5, 6]),
+            closed: hits(vec![3, 4, 7, 8, 9]),
         };
 
         let result = state.update(fetched_hits);
@@ -96,35 +101,35 @@ mod tests {
     #[test]
     fn test_all_closed() {
         let state = ListingState {
-            new: Hits(vec![hit(1)]),
-            existing: Hits(vec![hit(4)]),
-            closed: Hits(vec![hit(7)]),
+            new: hits(vec![1]),
+            existing: hits(vec![4]),
+            closed: hits(vec![7]),
         };
 
         let expected = ListingState {
-            new: Hits(Vec::new()),
-            existing: Hits(Vec::new()),
-            closed: Hits(vec![hit(1), hit(4), hit(7)]),
+            new: Hits::default(),
+            existing: Hits::default(),
+            closed: hits(vec![1, 4, 7]),
         };
 
-        let result = state.update(Hits(Vec::new()));
+        let result = state.update(Hits::default());
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_all_new() {
         let state = ListingState {
-            new: Hits(Vec::new()),
-            existing: Hits(Vec::new()),
-            closed: Hits(Vec::new()),
+            new: Hits::default(),
+            existing: Hits::default(),
+            closed: Hits::default(),
         };
 
-        let fetched_hits = Hits(vec![hit(1), hit(2), hit(3)]);
+        let fetched_hits = hits(vec![1, 2, 3]);
 
         let expected = ListingState {
-            new: Hits(vec![hit(1), hit(2), hit(3)]),
-            existing: Hits(Vec::new()),
-            closed: Hits(Vec::new()),
+            new: hits(vec![1, 2, 3]),
+            existing: Hits::default(),
+            closed: Hits::default(),
         };
 
         let result = state.update(fetched_hits);
@@ -134,12 +139,12 @@ mod tests {
     #[test]
     fn test_all_same_state() {
         let state = ListingState {
-            new: Hits(Vec::new()),
-            existing: Hits(vec![hit(1), hit(2), hit(3)]),
-            closed: Hits(Vec::new()),
+            new: Hits::default(),
+            existing: hits(vec![1, 2, 3]),
+            closed: Hits::default(),
         };
 
-        let fetched_hits = Hits(vec![hit(1), hit(2), hit(3)]);
+        let fetched_hits = hits(vec![1, 2, 3]);
 
         let result = state.update(fetched_hits);
         assert_eq!(result, state);

@@ -70,6 +70,7 @@ mod tests {
             requisition_id: format!("R{}", id),
             product: Some("".into()),
             title: "".into(),
+            absolute_url: "".into()
         }
     }
 

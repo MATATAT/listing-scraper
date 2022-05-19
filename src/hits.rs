@@ -11,6 +11,7 @@ pub struct Hit {
     pub requisition_id: String,
     pub product: Option<String>,
     pub title: String,
+    pub absolute_url: String
 }
 
 impl<'a> FromIterator<&'a Hit> for Hits {
@@ -39,13 +40,15 @@ mod tests {
                     "product": "P1",
                     "title": "A",
                     "requisition_id": "R1",
-                    "id": 1
+                    "id": 1,
+                    "absolute_url": ""
                 },
                 {
                     "product": null,
                     "title": "B",
                     "requisition_id": "R2",
-                    "id": 2
+                    "id": 2,
+                    "absolute_url": ""
                 }
             ]
         }
@@ -53,8 +56,8 @@ mod tests {
 
         let expected = Hits {
             hits: vec![
-                Hit { id: 1, requisition_id: "R1".into(), product: Some("P1".into()), title: "A".into() },
-                Hit { id: 2, requisition_id: "R2".into(), product: None, title: "B".into() }
+                Hit { id: 1, requisition_id: "R1".into(), product: Some("P1".into()), title: "A".into(), absolute_url: "".into() },
+                Hit { id: 2, requisition_id: "R2".into(), product: None, title: "B".into(), absolute_url: "".into() }
             ]
         };
 

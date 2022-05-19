@@ -6,7 +6,7 @@ pub type Result<T> = std::result::Result<T, ScraperError>;
 pub enum ScraperError {
     #[error("Error reading the configuration file.")]
     FileRead(#[from] std::io::Error),
-    #[error("Error parsing configuration file.")]
+    #[error("Error parsing json: {0}")]
     JsonParse(#[from] serde_json::error::Error),
     #[error("API request error: {0}")]
     ApiRequest(#[from] reqwest::Error),

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-pub struct Hits(pub Vec<Hit>);
+pub struct Hits(#[serde(rename = "hits")] pub Vec<Hit>);
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Hit {

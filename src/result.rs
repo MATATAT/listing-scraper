@@ -8,8 +8,8 @@ pub enum ScraperError {
     FileRead(#[from] std::io::Error),
     #[error("Error parsing configuration file.")]
     JsonParse(#[from] serde_json::error::Error),
-    #[error("API request error")]
+    #[error("API request error: {0}")]
     ApiRequest(#[from] reqwest::Error),
     #[error("Url parse error")]
-    UrlParse
+    UrlParse,
 }

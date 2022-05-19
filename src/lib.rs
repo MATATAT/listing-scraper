@@ -1,3 +1,4 @@
 pub mod config;
 pub mod result;
-pub mod client;
+pub mod job_client;
+pub mod hits;

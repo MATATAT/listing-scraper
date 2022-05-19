@@ -1,5 +1,5 @@
 use clap::Parser;
-use epic_games_career_scraper::{client::Client, config::Config, result::*};
+use epic_games_career_scraper::{job_client::JobClient, config::Config, result::*};
 use std::{process::exit, path::Path, fs};
 
 #[derive(Debug, Parser)]
@@ -26,7 +26,7 @@ fn execute(args: Args) -> Result<()> {
     let input_path = fs::canonicalize(Path::new(&args.config))?;
     let config = Config::from_json(input_path.as_path())?;
 
-    Client::new(config).request()?;
+    JobClient::new(config).request()?;
 
     Ok(())
 }

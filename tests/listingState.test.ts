@@ -75,4 +75,28 @@ describe("ListingState", () => {
 
         expect(state.update(fetchedHits)).toEqual(state);
     });
+
+    test('can be serialized', () => {
+        const state = new ListingState(
+            hits([1]),
+            [],
+            []
+        );
+
+        const expected = JSON.stringify({
+            newHits: [
+                {
+                    id: 1,
+                    requisition_id: 'R1',
+                    product: '',
+                    title: '',
+                    absolute_url: ''
+                }
+            ],
+            existingHits: [],
+            closedHits: []
+        });
+
+        expect(JSON.stringify(state)).toEqual(expected);
+    });
 });

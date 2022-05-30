@@ -6,7 +6,7 @@
     "license": "MIT",
     "type": "module",
     "scripts": {
-        "build": "webpack && cp ./src/config.json ./dist/",
+        "build": "webpack",
         "start": "node ./dist/index.js ./dist/config.json",
         "test": "jest tests",
         "clean": "rm ./dist/*"
@@ -20,6 +20,7 @@
         "@typescript-eslint/eslint-plugin": "^5.25.0",
         "@typescript-eslint/parser": "^5.25.0",
         "babel-jest": "^28.1.0",
+        "copy-webpack-plugin": "^11.0.0",
         "eslint": "^8.16.0",
         "jest": "^28.1.0",
         "ts-jest": "^28.0.2",

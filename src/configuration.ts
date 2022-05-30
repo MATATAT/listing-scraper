@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import fs from 'fs';
 
 export class Configuration {
     public url: string;
@@ -7,7 +7,13 @@ export class Configuration {
     public city: string;
     public department: string;
 
-    constructor() {}
+    constructor() {
+        this.url = '';
+        this.country = '';
+        this.state = '';
+        this.city = '';
+        this.department = '';
+    }
 
     static fromPath(configPath: string): Configuration {
         const configBuffer = fs.readFileSync(configPath);

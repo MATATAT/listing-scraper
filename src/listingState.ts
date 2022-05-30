@@ -1,18 +1,10 @@
-import { Hits } from "./hits";
+import { Hits } from './hits';
 
 export class ListingState {
-    constructor(
-        public newHits: Hits,
-        public existingHits: Hits,
-        public closedHits: Hits
-    ) { }
+    constructor(public newHits: Hits, public existingHits: Hits, public closedHits: Hits) {}
 
     public update(fetchedHits: Hits): ListingState {
-        return new ListingState(
-            this.getNew(fetchedHits),
-            this.getExisting(fetchedHits),
-            this.getClosed(fetchedHits)
-        );
+        return new ListingState(this.getNew(fetchedHits), this.getExisting(fetchedHits), this.getClosed(fetchedHits));
     }
 
     private getNew(fetchedHits: Hits): Hits {
@@ -34,10 +26,13 @@ export class ListingState {
     }
 
     private getClosed(fetchedHits: Hits): Hits {
-        return this.newHits.concat(this.existingHits).filter((hit) => {
-            return !fetchedHits.find((fetchedHit) => {
-                return fetchedHit.id === hit.id && fetchedHit.requisition_id === fetchedHit.requisition_id;
-            });
-        }).concat(this.closedHits);
+        return this.newHits
+            .concat(this.existingHits)
+            .filter((hit) => {
+                return !fetchedHits.find((fetchedHit) => {
+                    return fetchedHit.id === hit.id && fetchedHit.requisition_id === fetchedHit.requisition_id;
+                });
+            })
+            .concat(this.closedHits);
     }
 }

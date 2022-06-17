@@ -18,6 +18,6 @@ export async function handler(_event: APIGatewayEvent, _context: Context): Promi
 
             return listingStateClient.save(newState);
         })
-        .then(() => Promise.resolve({ statusCode: 200, body: 'State resolution succeeded' }))
-        .catch((reason: string) => Promise.reject({ statusCode: 500, body: `State resolution failed: ${reason}` }));
+        .then(() => Promise.resolve('State resolution succeeded'))
+        .catch((reason: string) => Promise.reject(`State resolution failed: ${reason}`));
 };

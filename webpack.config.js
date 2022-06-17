@@ -28,8 +28,7 @@ const config = {
         filename: 'index.js',
         path: path.resolve(url.fileURLToPath(new URL('.', import.meta.url)), 'dist'),
         library: {
-            type: 'module',
-            // export: 'default'
+            type: 'module'
         }
     },
     plugins: [

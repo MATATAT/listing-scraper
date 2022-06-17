@@ -1,0 +1,8 @@
+{
+    "name": "listing-scraper",
+    "version": "1.0.0",
+    "repository": "git@github.com:MATATAT/listing-scraper.git",
+    "author": "Matt Macdonald <kholdstare99@gmail.com>",
+    "license": "MIT",
+    "type": "module"
+}

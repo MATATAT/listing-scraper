@@ -1,19 +1,23 @@
 import { Configuration } from './configuration';
 import { ListingClient } from './listingClient';
-import { ListingState } from './listingState';
+import { ListingStateClient } from './listingStateClient';
+import { APIGatewayEvent, APIGatewayProxyResultV2, Context } from 'aws-lambda';
 
-(() => {
+export async function handler(_event: APIGatewayEvent, _context: Context): Promise<APIGatewayProxyResultV2> {
     const config = Configuration.fromPath('./config.json');
-    const fetchedHitsPromise = new ListingClient(config).request();
+    const listingClient = new ListingClient(config);
+    const listingStateClient = new ListingStateClient();
 
-    fetchedHitsPromise.then((fetchedHits) => {
-        const state = new ListingState([], [], []);
+    return Promise.all([listingClient.request(), listingStateClient.load()])
+        .then(([fetchedHits, listingState]) => {
+            if (!fetchedHits) {
+                return Promise.reject('Fetched hits was empty');
+            }
 
-        if (!fetchedHits) {
-            return;
-        }
-        const newState = state.update(fetchedHits);
+            const newState = listingState.update(fetchedHits);
 
-        console.log(newState);
-    });
-})();
+            return listingStateClient.save(newState);
+        })
+        .then(() => Promise.resolve({ statusCode: 200, body: 'State resolution succeeded' }))
+        .catch((reason: string) => Promise.reject({ statusCode: 500, body: `State resolution failed: ${reason}` }));
+};

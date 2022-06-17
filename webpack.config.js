@@ -11,19 +11,26 @@ const config = {
     module: {
         rules: [
             {
-                test: /.ts$/,
+                test: /\.tsx?$/,
                 use: 'ts-loader',
                 exclude: /node_modules/,
             },
         ],
     },
     resolve: {
-        extensions: ['.ts', '.js'],
+        extensions: ['.ts', '.tsx', '.js'],
+    },
+    optimization: {
+        // TODO: Look into not having to do this (mangled names issues)
+        minimize: false
     },
     output: {
         filename: 'index.js',
         path: path.resolve(url.fileURLToPath(new URL('.', import.meta.url)), 'dist'),
-        chunkFormat: 'module',
+        library: {
+            type: 'module',
+            // export: 'default'
+        }
     },
     plugins: [
         new CopyPlugin({

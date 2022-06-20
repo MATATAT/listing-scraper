@@ -1,4 +1,4 @@
-import { Stack, StackProps, RemovalPolicy, aws_s3 as s3, aws_lambda as lambda, Duration } from 'aws-cdk-lib';
+import { Stack, StackProps, RemovalPolicy, aws_s3 as s3, aws_lambda as lambda, aws_ses as ses, Duration } from 'aws-cdk-lib';
 import { Runtime, Code } from 'aws-cdk-lib/aws-lambda';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
@@ -25,7 +25,7 @@ export class DeployStack extends Stack {
         bucket.grantPut(lambdaFn);
 
         const eventRule = new Rule(this, 'ListingScraperTimer', {
-            schedule: Schedule.rate(Duration.days(1))
+            schedule: Schedule.rate(Duration.days(1)),
         });
 
         eventRule.addTarget(new LambdaFunction(lambdaFn));

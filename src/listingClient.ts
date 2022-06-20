@@ -8,6 +8,7 @@ export class ListingClient {
     constructor(public configuration: Configuration) {}
 
     public async request(): Promise<Hits | null> {
+        console.log('fetching listings...');
         const result = await got.get(this.buildRequestParams().toString()).json<HitsResult>();
         return Promise.resolve(this.mapResultToHits(result));
     }

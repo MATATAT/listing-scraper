@@ -1,7 +1,8 @@
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { Readable } from 'stream';
 import { ListingState } from './listingState';
 
-const LISTING_STATE_BUCKET = 'ListingStateBucket';
+const LISTING_STATE_BUCKET = 'listing-state-bucket';
 const STATE_KEY = 'State';
 
 export class ListingStateClient {
@@ -12,18 +13,23 @@ export class ListingStateClient {
     }
 
     public async load(): Promise<ListingState> {
+        console.log('loading listing state...');
         const getCommand = new GetObjectCommand({
             Bucket: LISTING_STATE_BUCKET,
             Key: STATE_KEY,
         });
 
         try {
-            const result = await this.s3Client.send(getCommand);
+            const result = await this.s3Client.send(getCommand).catch(() => Promise.reject('State does not exist'));
 
-            console.log(result.Body);
+            if (!result.Body) {
+                Promise.reject('Body is empty');
+            }
 
-            return new ListingState([], [], []);
+            const listingState: ListingState = JSON.parse(await this.readStreamToString(result.Body as Readable));
+            return new ListingState(listingState.newHits, listingState.existingHits, listingState.closedHits);
         } catch (e) {
+            console.log(`Error with state: ${e}. Creating new state...`);
             return new ListingState([], [], []);
         }
     }
@@ -32,10 +38,20 @@ export class ListingStateClient {
         const putCommand = new PutObjectCommand({
             Bucket: LISTING_STATE_BUCKET,
             Key: STATE_KEY,
+            ContentType: 'application/json',
             ContentLanguage: 'json',
             Body: JSON.stringify(state),
         });
 
         await this.s3Client.send(putCommand);
+    }
+
+    private async readStreamToString(stream: Readable): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const chunks: any[] = [];
+            stream.on('data', (chunk) => chunks.push(chunk));
+            stream.on('error', reject);
+            stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+        });
     }
 }

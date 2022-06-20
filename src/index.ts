@@ -10,12 +10,15 @@ export async function handler(_event: APIGatewayEvent, _context: Context): Promi
 
     return Promise.all([listingClient.request(), listingStateClient.load()])
         .then(([fetchedHits, listingState]) => {
+            console.log('listings and state retrieved...');
             if (!fetchedHits) {
                 return Promise.reject('Fetched hits was empty');
             }
 
+            console.log('updating state...');
             const newState = listingState.update(fetchedHits);
 
+            console.log('saving state...');
             return listingStateClient.save(newState);
         })
         .then(() => Promise.resolve('State resolution succeeded'))

@@ -1,4 +1,4 @@
-import { Stack, StackProps, RemovalPolicy, aws_s3 as s3, aws_lambda as lambda } from 'aws-cdk-lib';
+import { Stack, StackProps, RemovalPolicy, aws_s3 as s3, aws_lambda as lambda, Duration } from 'aws-cdk-lib';
 import { Runtime, Code } from 'aws-cdk-lib/aws-lambda';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
@@ -8,20 +8,24 @@ export class DeployStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
 
-        new s3.Bucket(this, 'ListingStateBucket', {
-            versioned: true,
-            removalPolicy: RemovalPolicy.DESTROY,
-            autoDeleteObjects: true,
-        });
-
         const lambdaFn = new lambda.Function(this, 'ListingScraperLambda', {
             runtime: Runtime.NODEJS_16_X,
             handler: 'index.handler',
             code: Code.fromAsset('../dist'),
         });
 
+        const bucket = new s3.Bucket(this, 'ListingStateBucket', {
+            bucketName: 'listing-state-bucket',
+            versioned: true,
+            removalPolicy: RemovalPolicy.DESTROY,
+            autoDeleteObjects: true,
+        });
+
+        bucket.grantRead(lambdaFn);
+        bucket.grantPut(lambdaFn);
+
         const eventRule = new Rule(this, 'ListingScraperTimer', {
-            schedule: Schedule.cron({ day: '1' })
+            schedule: Schedule.rate(Duration.days(1))
         });
 
         eventRule.addTarget(new LambdaFunction(lambdaFn));

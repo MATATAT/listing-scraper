@@ -1,11 +1,22 @@
 <div>
-    <% hits.forEach((hit) => { %>
-        <div>
-            <h3><%= hit.title %></h3>
-            <h5><%= hit.product %></h5>
+    <% if (newHits.length) { %>
+        <h1>New Listings</h1>
+        <% newHits.forEach((hit) => { %>
             <div>
-                <a href="<%= hit.absolute_url %>">Link</a>
+                <h3><%= hit.title %></h3>
+                <h5><%= hit.product %></h5>
+                <div>
+                    <a href="<%= hit.absolute_url %>">Link</a>
+                </div>
             </div>
-        </div>
-    <% }) %>
+        <% }) %>
+    <% } %>
+    <% if (closedHits.length) { %>
+        <h1>Closed Listings</h1>
+        <ul>
+        <% closedHits.forEach((hit) => { %>
+            <li><%= hit.title %></li>
+        <% }) %>
+        </ul>
+    <% } %>
 </div>

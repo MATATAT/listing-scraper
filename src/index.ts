@@ -1,9 +1,9 @@
 import { Configuration } from './configuration';
 import { ListingClient } from './listingClient';
 import { ListingStateClient } from './listingStateClient';
-import { APIGatewayEvent, APIGatewayProxyResultV2, Context } from 'aws-lambda';
 import { EmailClient } from './emailClient';
 import { IResult, Origin, Status } from './result';
+import { APIGatewayEvent, APIGatewayProxyResultV2, Context } from 'aws-lambda';
 
 export async function handler(_event: APIGatewayEvent, _context: Context): Promise<APIGatewayProxyResultV2> {
     const config = Configuration.fromPath('./config.json');
@@ -22,9 +22,9 @@ export async function handler(_event: APIGatewayEvent, _context: Context): Promi
             console.log('updating state...');
             const newState = listingState.update(fetchedHits);
             
-            if (newState.newHits.length) {
+            if (newState.newHits.length || newState.closedHits.length) {
                 console.log('New hits available. Sending email...');
-                actions.push(emailClient.sendNewHits(newState.newHits));
+                actions.push(emailClient.sendNewHits(newState));
             }
 
             console.log('saving state...');

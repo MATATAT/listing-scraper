@@ -1,11 +1,11 @@
-import { Hits } from './hits';
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+import { ListingState } from './listingState';
 import { IResult, Origin, Result } from './result';
 import ejs from 'ejs';
 import fs from 'fs';
 
 const TEMPLATE_PATH = './template.ejs';
-const SUBJECT_TEMPLATE = 'New listings for ';
+const SUBJECT_TEMPLATE = 'Listing changes for ';
 
 export class EmailClient {
     private sesClient: SESClient;
@@ -14,7 +14,7 @@ export class EmailClient {
         this.sesClient = new SESClient({});
     }
 
-    public async sendNewHits(newHits: Hits): Promise<IResult> {
+    public async sendNewHits(listingState: ListingState): Promise<IResult> {
         const sendEmailCommand = new SendEmailCommand({
             Source: 'mail@mattmacdonald.link',
             Destination: {
@@ -26,8 +26,8 @@ export class EmailClient {
                 },
                 Body: {
                     Html: {
-                        Data: this.formatEmail(TEMPLATE_PATH, newHits)
-                    }
+                        Data: this.formatEmail(TEMPLATE_PATH, listingState),
+                    },
                 },
             },
         });
@@ -43,8 +43,8 @@ export class EmailClient {
 
     private getTemplate = (templatePath: string): string => fs.readFileSync(templatePath).toString();
 
-    public formatEmail(templatePath: string, newHits: Hits): string {
+    public formatEmail(templatePath: string, listingState: ListingState): string {
         const templateSource = this.getTemplate(templatePath);
-        return ejs.render(templateSource, { hits: newHits });
+        return ejs.render(templateSource, listingState);
     }
 }

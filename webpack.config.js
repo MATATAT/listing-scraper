@@ -39,6 +39,11 @@ const config = {
                     to: '.',
                     context: './src/',
                 },
+                {
+                    from: '*.ejs',
+                    to: '.',
+                    context: './src/',
+                },
             ],
         }),
     ],

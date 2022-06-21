@@ -1,19 +1,13 @@
 import fs from 'fs';
 
 export class Configuration {
-    public url: string;
-    public country: string;
-    public state: string;
-    public city: string;
-    public department: string;
+    public url: string = '';
+    public country: string = '';
+    public state: string = '';
+    public city: string = '';
+    public department: string = '';
 
-    constructor() {
-        this.url = '';
-        this.country = '';
-        this.state = '';
-        this.city = '';
-        this.department = '';
-    }
+    constructor() {}
 
     static fromPath(configPath: string): Configuration {
         const configBuffer = fs.readFileSync(configPath);

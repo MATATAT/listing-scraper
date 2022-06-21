@@ -1,0 +1,11 @@
+<div>
+    <% hits.forEach((hit) => { %>
+        <div>
+            <h3><%= hit.title %></h3>
+            <h5><%= hit.product %></h5>
+            <div>
+                <a href="<%= hit.absolute_url %>">Link</a>
+            </div>
+        </div>
+    <% }) %>
+</div>

@@ -1,6 +1,7 @@
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { Readable } from 'stream';
 import { ListingState } from './listingState';
+import { IResult, Result, Origin } from './result';
 
 const LISTING_STATE_BUCKET = 'listing-state-bucket';
 const STATE_KEY = 'State';
@@ -34,7 +35,7 @@ export class ListingStateClient {
         }
     }
 
-    public async save(state: ListingState): Promise<void> {
+    public async save(state: ListingState): Promise<IResult> {
         const putCommand = new PutObjectCommand({
             Bucket: LISTING_STATE_BUCKET,
             Key: STATE_KEY,
@@ -43,7 +44,12 @@ export class ListingStateClient {
             Body: JSON.stringify(state),
         });
 
-        await this.s3Client.send(putCommand);
+        try {
+            await this.s3Client.send(putCommand);
+            return Result.ok(Origin.ListingState);
+        } catch (e) {
+            return Result.err(Origin.ListingState);
+        }
     }
 
     private async readStreamToString(stream: Readable): Promise<string> {

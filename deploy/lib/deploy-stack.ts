@@ -1,4 +1,4 @@
-import { Stack, StackProps, RemovalPolicy, aws_s3 as s3, aws_lambda as lambda, aws_ses as ses, Duration } from 'aws-cdk-lib';
+import { Stack, StackProps, RemovalPolicy, aws_s3 as s3, aws_lambda as lambda, aws_iam as iam, Duration } from 'aws-cdk-lib';
 import { Runtime, Code } from 'aws-cdk-lib/aws-lambda';
 import { Rule, Schedule } from 'aws-cdk-lib/aws-events';
 import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
@@ -13,6 +13,12 @@ export class DeployStack extends Stack {
             handler: 'index.handler',
             code: Code.fromAsset('../dist'),
         });
+
+        lambdaFn.addToRolePolicy(new iam.PolicyStatement({
+            actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+            resources: ['*'],
+            effect: iam.Effect.ALLOW
+        }));
 
         const bucket = new s3.Bucket(this, 'ListingStateBucket', {
             bucketName: 'listing-state-bucket',

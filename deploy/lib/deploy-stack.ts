@@ -31,7 +31,7 @@ export class DeployStack extends Stack {
         bucket.grantPut(lambdaFn);
 
         const eventRule = new Rule(this, 'ListingScraperTimer', {
-            schedule: Schedule.rate(Duration.days(1)),
+            schedule: Schedule.rate(Duration.hours(1)),
         });
 
         eventRule.addTarget(new LambdaFunction(lambdaFn));

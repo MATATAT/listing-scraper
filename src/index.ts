@@ -22,7 +22,7 @@ export async function handler(_event: APIGatewayEvent, _context: Context): Promi
             console.log('updating state...');
             const newState = listingState.update(fetchedHits);
             
-            if (newState.newHits.length || newState.closedHits.length) {
+            if (newState.newHits.length || (newState.closedHits.length > listingState.closedHits.length)) {
                 console.log('New hits available. Sending email...');
                 actions.push(emailClient.sendNewHits(newState));
             }
